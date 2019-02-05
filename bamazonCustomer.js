@@ -6,7 +6,8 @@ var connection = mysql.createConnection({
     user: "root",
     password: "root",
     port: 3306,
-    database: 'bamazon'
+    database: 'bamazon',
+    multipleStatements: true
 });
 
 connection.connect(function (err) {
@@ -36,26 +37,40 @@ inquirer
         });
         var product = answers.id
         var amount = Number(answers.quantity)
-        connection.query("SELECT quantity FROM products WHERE ID = " + product, function (err, res) {
+        console.log(amount)
+        connection.query("SELECT quantity FROM products WHERE ID = " + product, function (err, rows) {
             if (err) throw err;
-            var quantity = Number(res);
+            for (var i = 0; i < rows.length; i++) {
+                var row = rows[i];
+                ;
+                var number = row.quantity
+            }
+            // var number = rows[0].quantity;
+            // console.log(number)
             
-             if(quantity > amount)
+             if(number > amount)
          {
             connection.query(
-                'UPDATE products SET quantity = ' + (quantity - amount) + 'Where ID = ' + product,
+                'UPDATE products SET quantity = ? Where ID = ?; SELECT price FROM products WHERE ID = ?', [(number - amount), product, product],
+                
                 // [(Number("quantity") - amount), product],
                 function (err, result) {
                     if (err) throw err;
                     
 
-                    console.log(`Changed ${result.changedRows} row(s)`);
-                    console.log(result)
+                    // console.log(`Changed ${result.changedRows} row(s)`);
+                    console.log(result[0])
+                    for (var i = 0; i < result.length; i++) {
+                        var out = result[i];
+                        ;
+                        var final = out.price
+                     
+                    console.log("you owe $" + final)}
                 }
 
             );
         }
-        if (amount > quantity) { console.log("Sorry, we do not have that amount in stock") }
+        if (amount > number) { console.log("Sorry, we do not have that amount in stock") }
     })
 
     })
