@@ -51,7 +51,7 @@ inquirer
              if(number > amount)
          {
             connection.query(
-                'UPDATE products SET quantity = ? Where ID = ?; SELECT price FROM products WHERE ID = ?', [(number - amount), product, product],
+                'UPDATE products SET quantity = ? Where ID = ?', [(number - amount), product],
                 
                 // [(Number("quantity") - amount), product],
                 function (err, result) {
@@ -59,16 +59,21 @@ inquirer
                     
 
                     // console.log(`Changed ${result.changedRows} row(s)`);
-                    console.log(result[0])
-                    for (var i = 0; i < result.length; i++) {
-                        var out = result[i];
-                        ;
-                        var final = out.price
-                     
-                    console.log("you owe $" + final)}
+                    console.log(result)
+                    // for (var i = 0; i < result.length; i++) {
+                    //     var out = result[i];
+                    //     ;
+                    //     var final = out.price
+                     //cannot figure out how to nagivate object
+                     connection.query('SELECT price FROM products WHERE ID = ' + product, function(err, r) {
+                        if (err) throw err;
+                        console.log("you owe $" + r[0].price)
+                    })
                 }
 
+                
             );
+            
         }
         if (amount > number) { console.log("Sorry, we do not have that amount in stock") }
     })
